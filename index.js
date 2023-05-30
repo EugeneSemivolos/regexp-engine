@@ -16,9 +16,15 @@ function getText(args) {
 }
 
 function isPath(field) {
-  if (field[0] === '/' || field[0] === '\\') return true;
-  if (field[0] === '.' && (field[1] === '/' || field[1] === '\\')) return true;
-  if (field[0] === '.' && field[1] === '.' && (field[2] === '/' || field[2] === '\\')) return true;
+  //Linux or MacOS path
+  if (field[0] === '/') return true;                                          // root directory
+  if (field[0] === '.' && field[1] === '/') return true;                      // currect directory
+  if (field[0] === '.' && field[1] === '.' && field[2] === '/') return true;  // escape from directory
+
+  //Windows path
+  if (field[1] === ':' && field[2] === '\\') return true;                     // root directory
+  if (field[0] === '.' && field[1] === '\\') return true;                     // currect directory
+  if (field[0] === '.' && field[1] === '.' && field[2] === '\\') return true; // escape from directory
   return false;
 }
 
