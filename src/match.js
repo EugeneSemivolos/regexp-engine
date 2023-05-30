@@ -12,14 +12,14 @@ function matchExpr(expr, str, match_length = 0) {
 }
 
 function match(expr, str) {
-  let match_pos = 0;
+  let pos = 0;
   
-  while (match_pos < str.length - 1) {
-    const [matched, match_length] =  matchExpr(expr, str.slice(match_pos));
+  while (pos < str.length - 1) {
+    const [matched, match_length] =  matchExpr(expr, str.slice(pos));
       if (matched) {
-        return [matched, match_pos, match_length];
+        return [matched, pos, match_length];
       }
-      match_pos++;
+      pos++;
   }
   return [false, 0, 0];
 }
@@ -27,12 +27,14 @@ function match(expr, str) {
 function main() {
   const expr = 'world';
   const str = 'Hello, world!';
-  
+  console.log(`\nRegex: ${expr}\nString: ${str}`);
+
   const [matched, match_pos, match_length] = match(expr, str);
   if (matched) {
-    console.log(`match_expr(${expr}, ${str}) = True. From pos ${match_pos} to pos ${match_pos + match_length}`);
+    console.log(`Match: ${str.slice(match_pos, match_pos + match_length)}`);
   } else {
-    console.log(`match_expr(${expr}, ${str}) = False`);}
+    console.log("Match: not found");
+  }
+  console.log();
 }
-
 main();
