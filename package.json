@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/EugeneSemivolos/regexp-engine/issues"
   },
-  "homepage": "https://github.com/EugeneSemivolos/regexp-engine#readme"
+  "homepage": "https://github.com/EugeneSemivolos/regexp-engine#readme",
+  "dependencies": {
+    "jest": "^29.5.0"
+  }
 }
