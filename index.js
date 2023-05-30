@@ -8,24 +8,12 @@ function getRegExp(args) {
 function getText(args) {
   const field = args[3];
   if (!field) throw new Error("Enter the path to file or the text to search");
-  if (isPath(field)) {
+  try {
     const fileText = fs.readFileSync(field).toString();
     return fileText;
+  } catch {
+    return field;
   }
-  return field;
-}
-
-function isPath(field) {
-  //Linux or MacOS path
-  if (field[0] === '/') return true;                                          // root directory
-  if (field[0] === '.' && field[1] === '/') return true;                      // currect directory
-  if (field[0] === '.' && field[1] === '.' && field[2] === '/') return true;  // escape from directory
-
-  //Windows path
-  if (field[1] === ':' && field[2] === '\\') return true;                     // root directory
-  if (field[0] === '.' && field[1] === '\\') return true;                     // currect directory
-  if (field[0] === '.' && field[1] === '.' && field[2] === '\\') return true; // escape from directory
-  return false;
 }
 
 function main() {
