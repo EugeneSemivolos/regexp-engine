@@ -1,32 +1,93 @@
-const doesUnitMatch = (expr, str) => expr[0] === str[0];
+const isStar = (char) => char === '*';
+
+const isPlus = (char) => char === '+';
+
+const isQuestion = (char) => char === '?';
+
+const isOperator = (char) => isStar(char) || isPlus(char) || isQuestion(char);
+
+const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9");
+
+const isSet = (term) => isOpenSet(term[0]) && isCloseSet(term.slice(-1));
+
+const isUnit = (term) => isLiteral(term[0]) || isSet(term)
+
+const isOpenSet = (char) => char === '[';
+
+const isCloseSet = (char) => char === ']';
+
+function splitSet(set_head) {
+  const set_inside = set_head.slice(1, -1);
+  const set_terms = set_inside.split('');
+  return set_terms;
+}
+
+function splitExpr(expr) {
+  let head = '';
+  let operator = '';
+  let rest = '';
+  let last_expr_pos = 0;
+
+
+  if (isOpenSet(expr[0])) {
+    last_expr_pos = expr.indexOf(']') + 1;
+    head = expr.slice(0, last_expr_pos);
+  } else if (isLiteral(expr[0])) {
+    last_expr_pos = 1;
+    head = expr[0];
+  }
+
+  if (last_expr_pos < expr.length && isOperator(expr[last_expr_pos])) {
+    operator = expr[last_expr_pos];
+    last_expr_pos++;
+  }
+
+  rest = expr.slice(last_expr_pos);
+
+  return [head, operator, rest];
+}
+
+function doesUnitMatch(expr, str) { 
+  const [head, operator, rest] = splitExpr(expr);
+  if (isLiteral(head)) {
+    return expr[0] === str[0];
+  } else if (isSet(head)) {
+    const set_terms = splitSet(head);
+    return set_terms.includes(str[0]);
+  }
+  return false;
+}
 
 function matchExpr(expr, str, match_length = 0) {
   if (expr.length === 0) {
     return [true, match_length];
   }
-  if (doesUnitMatch(expr, str)) {
-    return matchExpr(expr.slice(1), str.slice(1), match_length + 1);
+
+  const [head, operator, rest] = splitExpr(expr);
+
+  if (isUnit(head)) {
+    if (doesUnitMatch(expr, str)) {
+      return matchExpr(rest, str.slice(1), match_length + 1);
+    }
   } else {
-    return [false, 0]
+    console.log(`Unknown token in expr ${expr}`);
   }
+  return [false, 0]
 }
 
 function match(expr, str) {
-  let pos = 0;
-  
-  while (pos < str.length - 1) {
+  for (let pos = 0; pos < str.length - 1; pos++) {
     const [matched, match_length] =  matchExpr(expr, str.slice(pos));
       if (matched) {
         return [matched, pos, match_length];
       }
-      pos++;
   }
   return [false, 0, 0];
 }
 
 function main() {
-  const expr = 'world';
-  const str = 'Hello, world!';
+  const expr = '[H][E]*llo';
+  const str = 'HEllo world';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [matched, match_pos, match_length] = match(expr, str);
