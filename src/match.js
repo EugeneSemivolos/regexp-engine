@@ -16,6 +16,14 @@ const isOpenSet = (char) => char === '[';
 
 const isCloseSet = (char) => char === ']';
 
+function removeSlashWrapper(expr) {
+  if (expr[0] === '/' && expr.slice(-1) === '/') {
+    return expr.slice(1, -1);
+  } else {
+    throw new Error('Incorrect RegExp. The RegExp must be wrapped in slashes');
+  }
+}
+
 function splitSet(set_head) {
   const set_inside = set_head.slice(1, -1);
   const set_terms = set_inside.split('');
@@ -70,19 +78,23 @@ function matchExpr(expr, str, match_length = 0) {
       return matchExpr(rest, str.slice(1), match_length + 1);
     }
   } else {
-    console.log(`Unknown token in expr ${expr}`);
+    throw new Error(`Unknown token in expr ${expr}`);
   }
   return [false, 0]
 }
 
-function match(expr, str) {
+function match(input_expr, str) {
+  if (input_expr.length === 0 || input_expr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
+  if (str.length === 0) throw new Error('Text to search is empty. To solve it enter the text');
+  const expr = removeSlashWrapper(input_expr);
+
   for (let pos = 0; pos < str.length - 1; pos++) {
     const [matched, match_length] =  matchExpr(expr, str.slice(pos));
       if (matched) {
         return [matched, pos, match_length];
       }
   }
-  return [false, 0, 0];
+  return [false, -1, -1];
 }
 
 function main() {
@@ -98,4 +110,6 @@ function main() {
   }
   console.log();
 }
-main();
+//main();
+
+module.exports = { match };
