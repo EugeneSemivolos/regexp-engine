@@ -61,5 +61,48 @@ describe('Testing function match()', () => {
     expect(length).toBe(2);
   });
 
-  
+  test('RegExp with one symbol set', () => {
+    const expr = '/m[iao]ke/';
+    const str = 'I can make something';
+    
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+    const [pos, length] = matchList[0];
+    expect(pos).toBe(6);
+    expect(length).toBe(4);
+  });
+
+  test('RegExp with few symbol sets', () => {
+    const expr = '/[123][abc][xyz]/';
+    const str = 'Can regexp find 2cx in this text?';
+    
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+    const [pos, length] = matchList[0];
+    expect(pos).toBe(16);
+    expect(length).toBe(3);
+  });
+
+  test('Multiple matching with few sets in RegExp', () => {
+    const expr = '/[123][abc][xyz]/';
+    const str = '1bz 4bx 3cx 2ay';
+    
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(3);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(8);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[2];
+    expect(pos).toBe(12);
+    expect(length).toBe(3);
+  });
 });
