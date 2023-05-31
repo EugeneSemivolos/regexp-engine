@@ -83,18 +83,21 @@ function matchExpr(expr, str, match_length = 0) {
   return [false, 0]
 }
 
-function match(input_expr, str) {
-  if (input_expr.length === 0 || input_expr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
+function match(inputExpr, str) {
+  if (inputExpr.length === 0 || inputExpr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
   if (str.length === 0) throw new Error('Text to search is empty. To solve it enter the text');
-  const expr = removeSlashWrapper(input_expr);
+  const expr = removeSlashWrapper(inputExpr);
 
+  const matchList = [];
   for (let pos = 0; pos < str.length - 1; pos++) {
-    const [matched, match_length] =  matchExpr(expr, str.slice(pos));
-      if (matched) {
-        return [matched, pos, match_length];
+    const [isMatched, match_length] =  matchExpr(expr, str.slice(pos));
+      if (isMatched) {
+        matchList.push([pos, match_length]);
+        pos += match_length;
       }
   }
-  return [false, -1, -1];
+  if (matchList.length !== 0) return [true, matchList];
+  return [false, []];
 }
 
 function main() {
@@ -102,8 +105,8 @@ function main() {
   const str = 'HEllo world';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
-  const [matched, match_pos, match_length] = match(expr, str);
-  if (matched) {
+  const [isMatched, match_pos, match_length] = match(expr, str);
+  if (isMatched) {
     console.log(`Match: ${str.slice(match_pos, match_pos + match_length)}`);
   } else {
     console.log("Match: not found");
