@@ -16,18 +16,14 @@ const isOpenSet = (char) => char === '[';
 
 const isCloseSet = (char) => char === ']';
 
+const splitSet = (set_head) => set_head.slice(1, -1).split('');
+
 function removeSlashWrapper(expr) {
   if (expr[0] === '/' && expr.slice(-1) === '/') {
     return expr.slice(1, -1);
   } else {
     throw new Error('Incorrect RegExp. The RegExp must be wrapped in slashes');
   }
-}
-
-function splitSet(set_head) {
-  const set_inside = set_head.slice(1, -1);
-  const set_terms = set_inside.split('');
-  return set_terms;
 }
 
 function splitExpr(expr) {
