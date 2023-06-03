@@ -75,7 +75,7 @@ function doesUnitMatch(expr, str) {
 }
 
 function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1) {
-  [head, operator, rest] = splitExpr(expr);
+  const [head, operator, rest] = splitExpr(expr);
   let submatch_length = -1;
 
   while (max_length === -1 || (submatch_length < max_length)) {
