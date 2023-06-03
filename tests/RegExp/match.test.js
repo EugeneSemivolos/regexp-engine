@@ -105,4 +105,97 @@ describe('Testing function match()', () => {
     expect(pos).toBe(12);
     expect(length).toBe(3);
   });
+
+  test('Dot in RegExp', () => {
+    const expr = '/[Cc].t/';
+    const str = 'Find cat and Cut';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(2);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(5);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(13);
+    expect(length).toBe(3);
+  });
+
+  test('Star in RegExp', () => {
+    const expr = '/ab*c/';
+    const str = 'Find ac abc abbbbc adc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(3);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(5);
+    expect(length).toBe(2);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(8);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[2];
+    expect(pos).toBe(12);
+    expect(length).toBe(6);
+  });
+
+  test('Plus in RegExp', () => {
+    const expr = '/ab+c/';
+    const str = 'Find ac abc abbbbc adc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(2);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(8);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(12);
+    expect(length).toBe(6);
+  });
+
+  test('Question mark in RegExp', () => {
+    const expr = '/ab?c/';
+    const str = 'Find ac abc abbbbc adc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(2);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(5);
+    expect(length).toBe(2);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(8);
+    expect(length).toBe(3);
+  });
+
+  test('Operators and sets in RegExp', () => {
+    const expr = '/[ali]+one?/';
+    const str = 'Does it find alone or lion? May one or alion? ';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(3);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(13);
+    expect(length).toBe(5);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(22);
+    expect(length).toBe(4);
+
+    [pos, length] = matchList[2];
+    expect(pos).toBe(39);
+    expect(length).toBe(5);
+  });
 });
