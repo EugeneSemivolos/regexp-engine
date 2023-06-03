@@ -6,11 +6,13 @@ const isQuestion = (char) => char === '?';
 
 const isOperator = (char) => isStar(char) || isPlus(char) || isQuestion(char);
 
+const isDot = (char) => char === '.';
+
 const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9");
 
 const isSet = (term) => isOpenSet(term[0]) && isCloseSet(term.slice(-1));
 
-const isUnit = (term) => isLiteral(term[0]) || isSet(term)
+const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term)
 
 const isOpenSet = (char) => char === '[';
 
@@ -36,7 +38,7 @@ function splitExpr(expr) {
   if (isOpenSet(expr[0])) {
     last_expr_pos = expr.indexOf(']') + 1;
     head = expr.slice(0, last_expr_pos);
-  } else if (isLiteral(expr[0])) {
+  } else {
     last_expr_pos = 1;
     head = expr[0];
   }
@@ -55,6 +57,8 @@ function doesUnitMatch(expr, str) {
   const [head, operator, rest] = splitExpr(expr);
   if (isLiteral(head)) {
     return expr[0] === str[0];
+  } else if (isDot(head)) {
+    return true;
   } else if (isSet(head)) {
     const set_terms = splitSet(head);
     return set_terms.includes(str[0]);
@@ -97,13 +101,16 @@ function match(inputExpr, str) {
 }
 
 function main() {
-  const expr = '[H][E]*llo';
+  const expr = '/[Hs][Es].lo/';
   const str = 'HEllo world';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
-  const [isMatched, match_pos, match_length] = match(expr, str);
+  const [isMatched, matchList] = match(expr, str);
   if (isMatched) {
-    console.log(`Match: ${str.slice(match_pos, match_pos + match_length)}`);
+    for (const item of matchList) {
+      const [pos, length] = item;
+      console.log(`Match: ${str.slice(pos, pos + length)}`);
+    }
   } else {
     console.log("Match: not found");
   }
