@@ -28,6 +28,14 @@ function removeSlashWrapper(expr) {
   }
 }
 
+function duplicate(str, n) {
+  let res = '';
+  for (let i = 0; i < n; i++) {
+    res += str;
+  }
+  return res;
+}
+
 function splitExpr(expr) {
   let head = '';
   let operator = '';
@@ -66,12 +74,44 @@ function doesUnitMatch(expr, str) {
   return false;
 }
 
+function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1) {
+  [head, operator, rest] = splitExpr(expr);
+  let submatch_length = -1;
+
+  while (max_length === -1 || (submatch_length < max_length)) {
+    const [subexpr_matched] = matchExpr(
+      duplicate(head, submatch_length + 1), 
+      str, 
+      match_length
+    );
+    if (!subexpr_matched) break;
+    submatch_length++;
+  }
+
+  while (submatch_length >= min_length) {
+    const [matched, new_match_length] = matchExpr(
+        duplicate(head, submatch_length) + rest, 
+        str, 
+        match_length
+    );
+    if (matched) return [matched, new_match_length];
+    submatch_length--;
+  }
+
+  return [false, 0];
+}
+
 function matchExpr(expr, str, match_length = 0) {
   if (expr.length === 0) {
     return [true, match_length];
   }
 
   const [head, operator, rest] = splitExpr(expr);
+
+  if (isStar(operator)) return matchMultiple(expr, str, match_length, 0);
+  if (isPlus(operator)) return matchMultiple(expr, str, match_length, 1);
+  if (isQuestion(operator)) return matchMultiple(expr, str, match_length, 0, 1);
+
 
   if (isUnit(head)) {
     if (doesUnitMatch(expr, str)) {
@@ -101,8 +141,8 @@ function match(inputExpr, str) {
 }
 
 function main() {
-  const expr = '/[Hs][Es].lo/';
-  const str = 'HEllo world';
+  const expr = '/a[bd]+c/';
+  const str = 'find abc adc ac me';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [isMatched, matchList] = match(expr, str);
@@ -116,6 +156,6 @@ function main() {
   }
   console.log();
 }
-//main();
+main();
 
 module.exports = { match };
