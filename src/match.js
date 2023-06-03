@@ -156,6 +156,6 @@ function main() {
   }
   console.log();
 }
-main();
+//main();
 
 module.exports = { match };
