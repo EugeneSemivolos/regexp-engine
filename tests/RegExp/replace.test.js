@@ -57,7 +57,7 @@ describe('Testing function replaceByRegExp()', () => {
     const str = 'There are cats, dogies, fish and so on';
     
     const res = replaceByRegExp(expr, 'animal', str);
-    expect(res).toBe('There are animal, animal, animal and so os');
+    expect(res).toBe('There are animal, animal, animal and so on');
   });
 
 });
