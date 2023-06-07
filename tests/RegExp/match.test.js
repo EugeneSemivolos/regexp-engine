@@ -240,4 +240,30 @@ describe('Testing function match()', () => {
     expect(pos).toBe(16);
     expect(length).toBe(5);
   });
+
+  test('Start symbol(^)', () => {
+    const expr = '/^abc/';
+    const str = 'abcd abc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(3);
+  });
+  
+  test('End symbol($)', () => {
+    const expr = '/abc$/';
+    const str = 'abcd sabc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(6);
+    expect(length).toBe(3);
+  });
 });
