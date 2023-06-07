@@ -1,3 +1,7 @@
+const isStart = (char) => char === '^';
+
+const isEnd = (char) => char === '$';
+
 const isStar = (char) => char === '*';
 
 const isPlus = (char) => char === '+';
@@ -8,17 +12,23 @@ const isOperator = (char) => isStar(char) || isPlus(char) || isQuestion(char);
 
 const isDot = (char) => char === '.';
 
+const isEscapeSequence = (term) => term[0] === '\\';
+
 const isOpenAlternate = (char) => char === '(';
 
 const isCLoseAlternate = (char) => char === ')';
 
-const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || (ch === ' ');
+const isAlpha = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
+
+const isDigit = (ch) => (ch >= "0" && ch <= "9");
+
+const isLiteral = (ch) => isAlpha(ch) || isDigit(ch) || ' :/'.includes(ch);
 
 const isSet = (term) => isOpenSet(term[0]) && isCloseSet(term.slice(-1));
 
 const isAlternate = (term) => isOpenAlternate(term[0]) && isCLoseAlternate(term.slice(-1));
 
-const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term)
+const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term) || isEscapeSequence(term);
 
 const isOpenSet = (char) => char === '[';
 
@@ -56,6 +66,9 @@ function splitExpr(expr) {
   } else if (isOpenAlternate(expr[0])) {
     last_expr_pos = expr.indexOf(')') + 1;
     head = expr.slice(0, last_expr_pos);
+  } else if (isEscapeSequence(expr)) {
+    last_expr_pos += 2;
+    head = expr.slice(0, 2);
   } else {
     last_expr_pos = 1;
     head = expr[0];
@@ -77,6 +90,11 @@ function doesUnitMatch(expr, str) {
   if (str.length === 0) return false;
   if (isLiteral(head)) return expr[0] === str[0];
   if (isDot(head)) return true;
+  if (isEscapeSequence(head)) {
+    if (head === '\\a') return isAlpha(str[0]);
+    if (head === '\\d') return isDigit(str[0]);
+    return false;
+  }
   if (isSet(head)) {
     const set_terms = splitSet(head);
     return set_terms.includes(str[0]);
@@ -126,8 +144,9 @@ function matchAlternate(expr, str, matchLength) {
 }
 
 function matchExpr(expr, str, match_length = 0) {
-  if (expr.length === 0) {
-    return [true, match_length];
+  if (expr.length === 0) return [true, match_length];
+  if (isEnd(expr[0])) {
+    return !str.length ? [true, match_length] : [false, 0];
   }
 
   const [head, operator, rest] = splitExpr(expr);
@@ -151,23 +170,29 @@ function matchExpr(expr, str, match_length = 0) {
 function match(inputExpr, str) {
   if (inputExpr.length === 0 || inputExpr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
   if (str.length === 0) throw new Error('Text to search is empty. To solve it enter the text');
-  const expr = removeSlashWrapper(inputExpr);
-
+  let expr = removeSlashWrapper(inputExpr);
   const matchList = [];
-  for (let pos = 0; pos < str.length - 1; pos++) {
+  let max_pos = str.length - 1;
+
+  if (isStart(expr[0])) {
+    max_pos = 0;
+    expr = expr.slice(1);
+  }
+
+  for (let pos = 0; pos <= max_pos; pos++) {
     const [isMatched, match_length] =  matchExpr(expr, str.slice(pos));
-      if (isMatched) {
-        matchList.push([pos, match_length]);
-        pos += match_length;
-      }
+    if (isMatched) {
+      matchList.push([pos, match_length]);
+      pos += match_length;
+    }
   }
   if (matchList.length !== 0) return [true, matchList];
   return [false, []];
 }
 
 function main() {
-  const expr = '/I am a (do*g|ca+t)/';
-  const str = 'Hello I am a dgdooogcatcaaat';
+  const expr = '/^http://(\\a|\\d)+.(com|net|org)/';
+  const str = 'http://zone03.com/hey/there';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [isMatched, matchList] = match(expr, str);

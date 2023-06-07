@@ -240,4 +240,66 @@ describe('Testing function match()', () => {
     expect(pos).toBe(16);
     expect(length).toBe(5);
   });
+
+  test('Start symbol(^)', () => {
+    const expr = '/^abc/';
+    const str = 'abcd abc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(3);
+  });
+  
+  test('End symbol($)', () => {
+    const expr = '/abc$/';
+    const str = 'abcd sabc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(6);
+    expect(length).toBe(3);
+  });
+
+  test('Start(^) and end($) symbols', () => {
+    const expr = '/^abc$/';
+    const str = 'abc';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(3);
+  });
+
+  test('Letters(\\a) and digits(\\d) in regexp', () => {
+    const expr = '/^http://(\\a|\\d)+.(com|net|org)/';
+    const str = 'http://zone03.com/hey/there';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(1);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(17);
+  });
+
+  test('No matches', () => {
+    const expr = '/^[lfc]am(eous|ing)/';
+    const str = 'There is nothing to search)';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(false);
+    expect(matchList.length).toBe(0);
+  });
+
 });
