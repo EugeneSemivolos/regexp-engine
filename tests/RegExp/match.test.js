@@ -1,4 +1,4 @@
-const { match } = require('../../src/match');
+const { matchByRegExp } = require('../../src/match');
 
 describe('Testing function match()', () => {
   test('No expression', () => {
@@ -6,7 +6,7 @@ describe('Testing function match()', () => {
     const str = 'Nothing to search';
 
     expect(() => {
-      match(expr, str);      
+      matchByRegExp(expr, str);      
     }).toThrow('There is no RegExp');
   });
 
@@ -15,7 +15,7 @@ describe('Testing function match()', () => {
     const str = '';
 
     expect(() => {
-      match(expr, str);      
+      matchByRegExp(expr, str);      
     }).toThrow('Text to search is empty');
   });
 
@@ -24,7 +24,7 @@ describe('Testing function match()', () => {
     const str = '21go';
 
     expect(() => {
-      match(expr, str);      
+      matchByRegExp(expr, str);      
     }).toThrow('Incorrect RegExp');
   });
 
@@ -32,7 +32,7 @@ describe('Testing function match()', () => {
     const expr = '/world/';
     const str = 'Hello, world!';
     
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
     const [pos, length] = matchList[0];
@@ -44,7 +44,7 @@ describe('Testing function match()', () => {
     const expr = '/is/';
     const str = 'This is Cris!';
     
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(3);
 
@@ -65,7 +65,7 @@ describe('Testing function match()', () => {
     const expr = '/m[iao]ke/';
     const str = 'I can make something';
     
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
     const [pos, length] = matchList[0];
@@ -77,7 +77,7 @@ describe('Testing function match()', () => {
     const expr = '/[123][abc][xyz]/';
     const str = 'Can regexp find 2cx in this text?';
     
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
     const [pos, length] = matchList[0];
@@ -89,7 +89,7 @@ describe('Testing function match()', () => {
     const expr = '/[123][abc][xyz]/';
     const str = '1bz 4bx 3cx 2ay';
     
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(3);
 
@@ -110,7 +110,7 @@ describe('Testing function match()', () => {
     const expr = '/[Cc].t/';
     const str = 'Find cat and Cut';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(2);
 
@@ -127,7 +127,7 @@ describe('Testing function match()', () => {
     const expr = '/ab*c/';
     const str = 'Find ac abc abbbbc adc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(3);
 
@@ -148,7 +148,7 @@ describe('Testing function match()', () => {
     const expr = '/ab+c/';
     const str = 'Find ac abc abbbbc adc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(2);
 
@@ -165,7 +165,7 @@ describe('Testing function match()', () => {
     const expr = '/ab?c/';
     const str = 'Find ac abc abbbbc adc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(2);
 
@@ -182,7 +182,7 @@ describe('Testing function match()', () => {
     const expr = '/[ali]+one?/';
     const str = 'Does it find alone or lion? May one or alion? ';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(3);
 
@@ -203,7 +203,7 @@ describe('Testing function match()', () => {
     const expr = '/I am a (cat|dog)/';
     const str = 'So I am a cat or I am a dog, whatever';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(2);
 
@@ -220,7 +220,7 @@ describe('Testing function match()', () => {
     const expr = '/(c[aeo]+t|do*g)/';
     const str = 'cat dog ct ceat dooog';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(4);
 
@@ -245,7 +245,7 @@ describe('Testing function match()', () => {
     const expr = '/^abc/';
     const str = 'abcd abc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
 
@@ -258,7 +258,7 @@ describe('Testing function match()', () => {
     const expr = '/abc$/';
     const str = 'abcd sabc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
 
@@ -271,7 +271,7 @@ describe('Testing function match()', () => {
     const expr = '/^abc$/';
     const str = 'abc';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
 
@@ -284,7 +284,7 @@ describe('Testing function match()', () => {
     const expr = '/^http://(\\a|\\d)+.(com|net|org)/';
     const str = 'http://zone03.com/hey/there';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(true);
     expect(matchList.length).toBe(1);
 
@@ -297,7 +297,7 @@ describe('Testing function match()', () => {
     const expr = '/^[lfc]am(eous|ing)/';
     const str = 'There is nothing to search)';
 
-    const [matched, matchList] = match(expr, str);
+    const [matched, matchList] = matchByRegExp(expr, str);
     expect(matched).toBe(false);
     expect(matchList.length).toBe(0);
   });
