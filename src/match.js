@@ -1,3 +1,7 @@
+const isStart = (char) => char === '^';
+
+const isEnd = (char) => char === '$';
+
 const isStar = (char) => char === '*';
 
 const isPlus = (char) => char === '+';
@@ -126,8 +130,9 @@ function matchAlternate(expr, str, match_length) {
 }
 
 function matchExpr(expr, str, match_length = 0) {
-  if (expr.length === 0) {
-    return [true, match_length];
+  if (expr.length === 0) return [true, match_length];
+  if (isEnd(expr[0])) {
+    return !str.length ? [true, match_length] : [false, 0];
   }
 
   const [head, operator, rest] = splitExpr(expr);
@@ -151,23 +156,29 @@ function matchExpr(expr, str, match_length = 0) {
 function match(inputExpr, str) {
   if (inputExpr.length === 0 || inputExpr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
   if (str.length === 0) throw new Error('Text to search is empty. To solve it enter the text');
-  const expr = removeSlashWrapper(inputExpr);
-
+  let expr = removeSlashWrapper(inputExpr);
   const matchList = [];
-  for (let pos = 0; pos < str.length - 1; pos++) {
+  let max_pos = str.length - 1;
+
+  if (isStart(expr[0])) {
+    max_pos = 0;
+    expr = expr.slice(1);
+  }
+
+  for (let pos = 0; pos <= max_pos; pos++) {
     const [isMatched, match_length] =  matchExpr(expr, str.slice(pos));
-      if (isMatched) {
-        matchList.push([pos, match_length]);
-        pos += match_length;
-      }
+    if (isMatched) {
+      matchList.push([pos, match_length]);
+      pos += match_length;
+    }
   }
   if (matchList.length !== 0) return [true, matchList];
   return [false, []];
 }
 
 function main() {
-  const expr = '/I am a (do*g|ca+t)/';
-  const str = 'Hello I am a dgdooogcatcaaat';
+  const expr = '/abc/';
+  const str = '11abcs';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [isMatched, matchList] = match(expr, str);
@@ -181,6 +192,6 @@ function main() {
   }
   console.log();
 }
-//main();
+main();
 
 module.exports = { match };
