@@ -55,37 +55,41 @@ function duplicate(str, n) {
 }
 
 function splitExpr(expr) {
-  let head = '';
-  let operator = '';
-  let rest = '';
-  let last_expr_pos = 0;
+  const splittedExpr = {
+    head: '',
+    operator: '',
+    rest: '',
+    lastPos: 0,
+  }
 
   if (isOpenSet(expr[0])) {
-    last_expr_pos = expr.indexOf(']') + 1;
-    head = expr.slice(0, last_expr_pos);
+    const lastPos = expr.indexOf(']') + 1;
+    splittedExpr.head = expr.slice(0, lastPos);
+    splittedExpr.lastPos = lastPos;
   } else if (isOpenAlternate(expr[0])) {
-    last_expr_pos = expr.indexOf(')') + 1;
-    head = expr.slice(0, last_expr_pos);
+    const lastPos = expr.indexOf(')') + 1;
+    splittedExpr.head = expr.slice(0, lastPos);
+    splittedExpr.lastPos = lastPos;
   } else if (isEscapeSequence(expr)) {
-    last_expr_pos += 2;
-    head = expr.slice(0, 2);
+    splittedExpr.lastPos += 2;
+    splittedExpr.head = expr.slice(0, 2);
   } else {
-    last_expr_pos = 1;
-    head = expr[0];
+    splittedExpr.lastPos = 1;
+    splittedExpr.head = expr[0];
+  }
+ 
+  if (splittedExpr.lastPos < expr.length && isOperator(expr[splittedExpr.lastPos])) {
+    splittedExpr.operator = expr[ splittedExpr.lastPos];
+    splittedExpr.lastPos++;
   }
 
-  if (last_expr_pos < expr.length && isOperator(expr[last_expr_pos])) {
-    operator = expr[last_expr_pos];
-    last_expr_pos++;
-  }
+  splittedExpr.rest = expr.slice(splittedExpr.lastPos);
 
-  rest = expr.slice(last_expr_pos);
-
-  return [head, operator, rest];
+  return splittedExpr;
 }
 
 function doesUnitMatch(expr, str) { 
-  const [head, operator, rest] = splitExpr(expr);
+  const { head } = splitExpr(expr);
 
   if (str.length === 0) return false;
   if (isLiteral(head)) return expr[0] === str[0];
@@ -103,7 +107,7 @@ function doesUnitMatch(expr, str) {
 }
 
 function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1) {
-  const [head, operator, rest] = splitExpr(expr);
+  const { head, rest } = splitExpr(expr);
   let submatch_length = -1;
 
   while (max_length === -1 || (submatch_length < max_length)) {
@@ -130,7 +134,7 @@ function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1)
 }
 
 function matchAlternate(expr, str, matchLength) {
-  const [head, operator, rest] = splitExpr(expr);
+  const {head, rest} = splitExpr(expr);
   const options = splitAlternate(head);
   for (const option of options) {
     const [isMatched, newMatchLength] = matchExpr(
@@ -149,7 +153,7 @@ function matchExpr(expr, str, match_length = 0) {
     return !str.length ? [true, match_length] : [false, 0];
   }
 
-  const [head, operator, rest] = splitExpr(expr);
+  const {head, operator, rest} = splitExpr(expr);
 
   if (isStar(operator)) return matchMultiple(expr, str, match_length, 0);
   if (isPlus(operator)) return matchMultiple(expr, str, match_length, 1);

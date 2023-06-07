@@ -4,12 +4,11 @@ function replaceByRegExp(inputExpr, word, str) {
   if (inputExpr.length === 0 || inputExpr === '//') throw new Error('There is no RegExp. To solve it enter the RegExp');
   if (str.length === 0) throw new Error('Text to search is empty. To solve this problem enter the text');
   
-  let expr = removeSlashWrapper(inputExpr);
+  const expr = removeSlashWrapper(inputExpr);
   let resStr = str;
   
   if (isStart(expr[0])) {
-    expr = expr.slice(1);
-    const [isMatched, length] =  matchExpr(expr, resStr);
+    const [isMatched, length] =  matchExpr(expr.slice(1), resStr);
     if (isMatched) {
       resStr = word + resStr.slice(length);
     }
