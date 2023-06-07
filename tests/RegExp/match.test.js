@@ -198,4 +198,46 @@ describe('Testing function match()', () => {
     expect(pos).toBe(39);
     expect(length).toBe(5);
   });
+
+  test('Alternates in RegExp', () => {
+    const expr = '/I am a (cat|dog)/';
+    const str = 'So I am a cat or I am a dog, whatever';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(2);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(3);
+    expect(length).toBe(10);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(17);
+    expect(length).toBe(10);
+  });
+
+  test('Alternates, sets and operators in RegExp', () => {
+    const expr = '/(c[aeo]+t|do*g)/';
+    const str = 'cat dog ct ceat dooog';
+
+    const [matched, matchList] = match(expr, str);
+    expect(matched).toBe(true);
+    expect(matchList.length).toBe(4);
+
+    let [pos, length] = matchList[0];
+    expect(pos).toBe(0);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[1];
+    expect(pos).toBe(4);
+    expect(length).toBe(3);
+
+    [pos, length] = matchList[2];
+    expect(pos).toBe(11);
+    expect(length).toBe(4);
+
+    [pos, length] = matchList[3];
+    expect(pos).toBe(16);
+    expect(length).toBe(5);
+  });
 });

@@ -8,9 +8,15 @@ const isOperator = (char) => isStar(char) || isPlus(char) || isQuestion(char);
 
 const isDot = (char) => char === '.';
 
-const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9");
+const isOpenAlternate = (char) => char === '(';
+
+const isCLoseAlternate = (char) => char === ')';
+
+const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || (ch === ' ');
 
 const isSet = (term) => isOpenSet(term[0]) && isCloseSet(term.slice(-1));
+
+const isAlternate = (term) => isOpenAlternate(term[0]) && isCLoseAlternate(term.slice(-1));
 
 const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term)
 
@@ -19,6 +25,8 @@ const isOpenSet = (char) => char === '[';
 const isCloseSet = (char) => char === ']';
 
 const splitSet = (set_head) => set_head.slice(1, -1).split('');
+
+const splitAlternate = (alternate) => alternate.slice(1, -1).split('|');
 
 function removeSlashWrapper(expr) {
   if (expr[0] === '/' && expr.slice(-1) === '/') {
@@ -42,9 +50,11 @@ function splitExpr(expr) {
   let rest = '';
   let last_expr_pos = 0;
 
-
   if (isOpenSet(expr[0])) {
     last_expr_pos = expr.indexOf(']') + 1;
+    head = expr.slice(0, last_expr_pos);
+  } else if (isOpenAlternate(expr[0])) {
+    last_expr_pos = expr.indexOf(')') + 1;
     head = expr.slice(0, last_expr_pos);
   } else {
     last_expr_pos = 1;
@@ -63,11 +73,11 @@ function splitExpr(expr) {
 
 function doesUnitMatch(expr, str) { 
   const [head, operator, rest] = splitExpr(expr);
-  if (isLiteral(head)) {
-    return expr[0] === str[0];
-  } else if (isDot(head)) {
-    return true;
-  } else if (isSet(head)) {
+
+  if (str.length === 0) return false;
+  if (isLiteral(head)) return expr[0] === str[0];
+  if (isDot(head)) return true;
+  if (isSet(head)) {
     const set_terms = splitSet(head);
     return set_terms.includes(str[0]);
   }
@@ -101,6 +111,20 @@ function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1)
   return [false, 0];
 }
 
+function matchAlternate(expr, str, matchLength) {
+  const [head, operator, rest] = splitExpr(expr);
+  const options = splitAlternate(head);
+  for (const option of options) {
+    const [isMatched, newMatchLength] = matchExpr(
+      option + rest, 
+      str,
+      matchLength
+    );
+    if (isMatched) return [isMatched, newMatchLength];
+  }
+  return [false, 0];
+}
+
 function matchExpr(expr, str, match_length = 0) {
   if (expr.length === 0) {
     return [true, match_length];
@@ -112,6 +136,7 @@ function matchExpr(expr, str, match_length = 0) {
   if (isPlus(operator)) return matchMultiple(expr, str, match_length, 1);
   if (isQuestion(operator)) return matchMultiple(expr, str, match_length, 0, 1);
 
+  if (isAlternate(head)) return matchAlternate(expr, str, match_length);
 
   if (isUnit(head)) {
     if (doesUnitMatch(expr, str)) {
@@ -141,8 +166,8 @@ function match(inputExpr, str) {
 }
 
 function main() {
-  const expr = '/a[bd]+c/';
-  const str = 'find abc adc ac me';
+  const expr = '/I am a (do*g|ca+t)/';
+  const str = 'Hello I am a dgdooogcatcaaat';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [isMatched, matchList] = match(expr, str);
