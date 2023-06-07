@@ -12,17 +12,23 @@ const isOperator = (char) => isStar(char) || isPlus(char) || isQuestion(char);
 
 const isDot = (char) => char === '.';
 
+const isEscapeSequence = (term) => term[0] === '\\';
+
 const isOpenAlternate = (char) => char === '(';
 
 const isCLoseAlternate = (char) => char === ')';
 
-const isLiteral = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || (ch === ' ');
+const isAlpha = (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
+
+const isDigit = (ch) => (ch >= "0" && ch <= "9");
+
+const isLiteral = (ch) => isAlpha(ch) || isDigit(ch) || ' :/'.includes(ch);
 
 const isSet = (term) => isOpenSet(term[0]) && isCloseSet(term.slice(-1));
 
 const isAlternate = (term) => isOpenAlternate(term[0]) && isCLoseAlternate(term.slice(-1));
 
-const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term)
+const isUnit = (term) => isLiteral(term[0]) || isDot(term[0]) || isSet(term) || isEscapeSequence(term);
 
 const isOpenSet = (char) => char === '[';
 
@@ -60,6 +66,9 @@ function splitExpr(expr) {
   } else if (isOpenAlternate(expr[0])) {
     last_expr_pos = expr.indexOf(')') + 1;
     head = expr.slice(0, last_expr_pos);
+  } else if (isEscapeSequence(expr)) {
+    last_expr_pos += 2;
+    head = expr.slice(0, 2);
   } else {
     last_expr_pos = 1;
     head = expr[0];
@@ -81,6 +90,11 @@ function doesUnitMatch(expr, str) {
   if (str.length === 0) return false;
   if (isLiteral(head)) return expr[0] === str[0];
   if (isDot(head)) return true;
+  if (isEscapeSequence(head)) {
+    if (head === '\\a') return isAlpha(str[0]);
+    if (head === '\\d') return isDigit(str[0]);
+    return false;
+  }
   if (isSet(head)) {
     const set_terms = splitSet(head);
     return set_terms.includes(str[0]);
@@ -177,8 +191,8 @@ function match(inputExpr, str) {
 }
 
 function main() {
-  const expr = '/abc/';
-  const str = '11abcs';
+  const expr = '/^http://(\\a|\\d)+.(com|net|org)/';
+  const str = 'http://zone03.com/hey/there';
   console.log(`\nRegex: ${expr}\nString: ${str}`);
 
   const [isMatched, matchList] = match(expr, str);
@@ -192,6 +206,6 @@ function main() {
   }
   console.log();
 }
-main();
+//main();
 
 module.exports = { match };
