@@ -111,16 +111,16 @@ function matchMultiple(expr, str, match_length, min_length = 0, max_length = -1)
   return [false, 0];
 }
 
-function matchAlternate(expr, str, match_length) {
+function matchAlternate(expr, str, matchLength) {
   const [head, operator, rest] = splitExpr(expr);
   const options = splitAlternate(head);
   for (const option of options) {
-    const [matched, new_match_length] = matchExpr(
+    const [isMatched, newMatchLength] = matchExpr(
       option + rest, 
       str,
-      match_length
+      matchLength
     );
-    if (matched) return [matched, new_match_length];
+    if (isMatched) return [isMatched, newMatchLength];
   }
   return [false, 0];
 }
