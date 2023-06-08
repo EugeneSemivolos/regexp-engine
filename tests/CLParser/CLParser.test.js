@@ -1,5 +1,4 @@
 const CLParser = require("../../src/CLParser");
-var path = require("path");
 
 describe('Testing CLIParser', () => {
   test('No arguments', () => {
