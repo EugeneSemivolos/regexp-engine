@@ -1,5 +1,6 @@
 
 
+
 # RegExp Engine
 
 ---
@@ -20,6 +21,23 @@ The reviews were done by [Yaryna Bashchak](https://github.com/yaryna-bashchak) a
 ### Pull Requests
 
 [here](https://github.com/EugeneSemivolos/regexp-engine/pulls)
+
+---
+
+## Meaning of special characters in reg-exp
+
+| *abc* | simple word. |
+|-------|--------------|
+| *[abc]* | Character set. Matches any of the bracketed characters. |
+| *(x\|y)* | Alternates. Matches any of the words separated by a symbol '\|' |
+| . | The dot matches any character |
+| *\a* | Matches any letter |
+| *\d* | Matches a digit character |
+|*^x*  | Matches with the start of input. |
+| *x$* | Matches with the end of input. |
+| *x\** | Matches the preceding element x zero or more times. |
+| *x+* | Matches the preceding element x one or more times. |
+| *x?* | Matches the preceding element x zero or one time. |
 
 
 ## How to install and run the project
