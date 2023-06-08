@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "match": "node index.js match",
+    "replace": "node index.js replace",
     "test": "jest"
   },
   "repository": {
