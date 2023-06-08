@@ -21,8 +21,7 @@ function matchByRegExp(inputExpr, str) {
       pos += match_length;
     }
   }
-  if (matchList.length !== 0) return [true, matchList];
-  return [false, []];
+  return matchList;
 }
 
 module.exports = { matchByRegExp };
